@@ -1,4 +1,5 @@
 const axios = require('axios');
+const cheerio = require('cheerio');
 const Menu = require('./Menu');
 
 class MenuCrawler {
@@ -7,16 +8,21 @@ class MenuCrawler {
     }
 
     async getMenu(title) {
-        console.log('Requesting menu: ', title)
         const titleLower = title.toLowerCase()
         if (!['a', 'b'].includes(titleLower)) {
             return
         }
-        await this.fetchData()
+
+        return this.getMenus()
     }
 
-    async fetchData() {
+    async getMenus() {
         const url = 'https://millcantin.hu/termekkategoria/etlap/02-menuk';
+        return await this.fetchData(url)
+            .then(res => this.getMenuUrls(res))
+    }
+
+    async fetchData(url) {
         console.log('Fetching data from: ', url)
         const response = await axios(url).catch(err => console.log(err))
 
@@ -26,6 +32,17 @@ class MenuCrawler {
         }
         return response
     };
+
+    getMenuUrls(res) {
+        const $ = cheerio.load(res.data)
+        const section = $('a.product-image')
+        const menuUrls = []
+        section.each(function () {
+            menuUrls.push(($(this).attr('href')))
+        })
+        console.log('Fetching menus from: ', menuUrls)
+        return menuUrls
+    }
 }
 
 module.exports = MenuCrawler;
