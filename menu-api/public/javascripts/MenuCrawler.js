@@ -13,7 +13,14 @@ class MenuCrawler {
             return
         }
 
-        return this.getMenus()
+        await this.getMenus()
+
+        return this.menus.find(menu => {
+            if (menu.title == titleLower) {
+                console.log('Requested menu is: ', menu)
+                return menu
+            }
+        })
     }
 
     async getMenus() {
@@ -53,7 +60,7 @@ class MenuCrawler {
         const section = $('div.summary.entry-summary')
         const menu = new Menu()
         section.each(function () {
-            menu.title = $(this).find('h1.product_title.entry-title').text()
+            menu.title = $(this).find('h1.product_title.entry-title').text().charAt(0).toLowerCase()
             console.log(menu)
         })
         return menu
