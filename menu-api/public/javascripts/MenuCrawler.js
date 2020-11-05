@@ -6,9 +6,13 @@ class MenuCrawler {
         this.menus = []
     }
 
-    async getMenu() {
+    async getMenu(title) {
+        console.log('Requesting menu: ', title)
+        const titleLower = title.toLowerCase()
+        if (!['a', 'b'].includes(titleLower)) {
+            return
+        }
         await this.fetchData()
-        return new Menu
     }
 
     async fetchData() {
