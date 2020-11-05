@@ -17,9 +17,13 @@ class MenuCrawler {
     }
 
     async getMenus() {
-        const url = 'https://millcantin.hu/termekkategoria/etlap/02-menuk';
-        return await this.fetchData(url)
-            .then(res => this.getMenuUrls(res))
+        const cantinUrl = 'https://millcantin.hu/termekkategoria/etlap/02-menuk';
+        const menuUrls = await this.fetchData(cantinUrl).then(res => this.getMenuUrls(res))
+        for (const url of menuUrls) {
+            await this.fetchData(url)
+                .then(res => this.getMenuData(res))
+                .then(menu => { this.menus.push(menu) })
+        }
     }
 
     async fetchData(url) {
@@ -42,6 +46,17 @@ class MenuCrawler {
         })
         console.log('Fetching menus from: ', menuUrls)
         return menuUrls
+    }
+
+    getMenuData(res) {
+        const $ = cheerio.load(res.data)
+        const section = $('div.summary.entry-summary')
+        const menu = new Menu()
+        section.each(function () {
+            menu.title = $(this).find('h1.product_title.entry-title').text()
+            console.log(menu)
+        })
+        return menu
     }
 }
 
