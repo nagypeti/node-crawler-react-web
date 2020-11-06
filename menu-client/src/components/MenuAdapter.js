@@ -7,8 +7,8 @@ class MenuAdapter extends Component {
         this.state = { menu: {} }
     }
 
-    async fetchData() {
-        fetch(`http://localhost:8080/api/menus/${this.props.option}`)
+    fetchData = async () => {
+        await fetch(`http://localhost:8080/api/menus/${this.props.option}`)
             .then(res => res.json())
             .then(res => { this.setState({ menu: this.transformMenu(res) }) })
             .catch(err => err)
@@ -16,6 +16,13 @@ class MenuAdapter extends Component {
 
     async componentDidMount() {
         await this.fetchData()
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.option !== this.props.option) {
+            this.fetchData()
+        }
+        console.log(prevProps, prevState)
     }
 
     transformMenu = (menu) => {
